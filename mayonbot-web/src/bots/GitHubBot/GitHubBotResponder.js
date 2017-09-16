@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Loading } from 'react-simple-chatbot';
 
-class Custom extends Component {
+class GitHubBotResponder extends Component {
   state = {
     loading: false,
     loadingStar: false,
@@ -135,4 +135,4 @@ class Custom extends Component {
   }
 }
 
-export default Custom;
+export default GitHubBotResponder;

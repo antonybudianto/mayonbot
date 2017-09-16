@@ -1,27 +1,7 @@
 import React, { Component } from 'react';
-import ChatBot from 'react-simple-chatbot';
-import Custom from './Custom';
+import GitHubBot from './bots/GitHubBot';
 
 import './App.css';
-
-const steps = [
-  {
-    id: '1',
-    message: 'Please enter the GitHub username',
-    trigger: 'username',
-  },
-  {
-    id: 'username',
-    user: true,
-    trigger: '3',
-  },
-  {
-    id: '3',
-    component: <Custom />,
-    waitAction: true,
-    trigger: '1'
-  },
-];
 
 class App extends Component {
   render() {
@@ -35,7 +15,7 @@ class App extends Component {
           justifyContent: 'center',
           margin: '20px'
         }}>
-          <ChatBot headerTitle="GitHubBot" steps={steps} />
+          <GitHubBot/>
         </div>
       </div>
     );
