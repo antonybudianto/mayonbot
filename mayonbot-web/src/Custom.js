@@ -3,12 +3,16 @@ import { Loading } from 'react-simple-chatbot';
 
 class Custom extends Component {
   state = {
-    loading: true,
+    loading: false,
+    loadingStar: false,
+    starCount: 0,
     result: '',
     trigger: false,
   };
 
   componentWillMount() {
+    const { steps } = this.props;
+    this.fetchUser(steps.username.value);
     this.countStar();
   }
 
@@ -19,6 +23,9 @@ class Custom extends Component {
     let lastPage = false;
     let page = 1;
     let stars = 0;
+    this.setState({
+      loadingStar: true
+    });
 
     while(lastPage === false) {
       try {
@@ -29,19 +36,39 @@ class Custom extends Component {
         stars += result.reduce((acc, curr) => acc + curr.stargazers_count, 0);
         if (lastPage) {
           self.setState({
-            loading: false,
-            result: `${username} has ${stars} stars total`
+            loadingStar: false,
+            starCount: stars
           });
         } else {
           page++;
         }
       } catch (err) {
         self.setState({
-          loading: false,
-          result: err.message
+          loadingStar: false,
+          starCount: 0
         });
         lastPage = true;
       }
+    }
+  }
+
+  async fetchUser(username) {
+    this.setState({
+      loading: true
+    });
+    try {
+      let res = await fetch(`https://api.github.com/users/${username}`);
+      let result = await res.json();
+      console.log(result);
+      this.setState({
+        loading: false,
+        result
+      });
+    } catch (e) {
+      this.setState({
+        loading: false,
+        result: e.message
+      });
     }
   }
 
@@ -56,7 +83,35 @@ class Custom extends Component {
 
     return (
       <div>
-      { loading ? <Loading /> : result }
+      { loading ? <Loading /> : (
+        <div>
+          <div style={{
+            textAlign: 'center'
+          }}>
+          <img alt={result.name} src={result.avatar_url} width="50" height="50"/> <br/>
+          <strong>{this.state.loadingStar ? 'loading' : this.state.starCount}</strong> stars <br/>
+          </div>
+          <table>
+            <tbody>
+              <tr>
+                <th>Name:</th><td> {result.name}</td>
+              </tr>
+              <tr>
+                <th>Location:</th><td> {result.location || '-'}</td>
+              </tr>
+              <tr>
+                <th>Company:</th><td> {result.company || '-'}</td>
+              </tr>
+              <tr>
+                <th>Followers:</th><td> {result.followers}</td>
+              </tr>
+              <tr>
+                <th>Following:</th><td> {result.following}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ) }
       {
           !loading &&
           <div
