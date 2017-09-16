@@ -22,7 +22,7 @@ const steps = [
 ];
 
 const GitHubBot = () => (
-  <ChatBot headerTitle="GitHubBot" steps={steps} />
+  <ChatBot headerTitle="GitHub Bot" steps={steps} />
 );
 
 export default GitHubBot;
