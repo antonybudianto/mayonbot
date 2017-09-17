@@ -5,7 +5,7 @@ class GitHubBotResponder extends Component {
   state = {
     loading: false,
     loadingStar: false,
-    starCount: 0,
+    repos: [],
     result: '',
     trigger: false,
   };
@@ -22,7 +22,7 @@ class GitHubBotResponder extends Component {
     const username = steps.username.value;
     let lastPage = false;
     let page = 1;
-    let stars = 0;
+    let repos = [];
     this.setState({
       loadingStar: true
     });
@@ -33,19 +33,18 @@ class GitHubBotResponder extends Component {
         let result = await res.json();
         if (result.message) throw new Error(result.message);
         lastPage = result.length === 0;
-        stars += result.reduce((acc, curr) => acc + curr.stargazers_count, 0);
+        repos = [...repos, ...result];
         if (lastPage) {
           self.setState({
             loadingStar: false,
-            starCount: stars
+            repos
           });
         } else {
           page++;
         }
       } catch (err) {
         self.setState({
-          loadingStar: false,
-          starCount: 0
+          loadingStar: false
         });
         lastPage = true;
       }
@@ -59,7 +58,6 @@ class GitHubBotResponder extends Component {
     try {
       let res = await fetch(`https://api.github.com/users/${username}`);
       let result = await res.json();
-      console.log(result);
       this.setState({
         loading: false,
         result
@@ -88,8 +86,8 @@ class GitHubBotResponder extends Component {
           <div style={{
             textAlign: 'center'
           }}>
-          <img alt={result.name} src={result.avatar_url} width="50" height="50"/> <br/>
-          <strong>{this.state.loadingStar ? 'loading' : this.state.starCount}</strong> stars <br/>
+          <img alt={result.name} src={result.avatar_url} width="100" height="100"/> <br/>
+          <strong>{this.state.loadingStar ? 'loading' : this.state.repos.reduce((a, c) => a + c['stargazers_count'], 0)}</strong> stars <br/>
           </div>
           <table>
             <tbody>
@@ -107,6 +105,14 @@ class GitHubBotResponder extends Component {
               </tr>
               <tr>
                 <th>Following:</th><td> {result.following}</td>
+              </tr>
+              <tr>
+                <th>Repos:</th>
+                <td>
+                  All: {this.state.repos.length} <br/>
+                  Forks: {this.state.repos.filter(r => r.fork).length} <br/>
+                  Sources: {this.state.repos.filter(r => !r.fork).length}
+                </td>
               </tr>
             </tbody>
           </table>
